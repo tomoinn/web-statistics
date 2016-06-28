@@ -1,0 +1,166 @@
+<h2>Circular Plot</h2>
+<p>This page can be used to produce a circular plot, with variable cycle length and binning. The plot generates a
+    frequency histogram of your data, with the 0 point on the diagram at the North axis (i.e. where 12:00 would be on a
+    regular wall clock).</p>
+<p>Data, and configuration properties where applicable, are expressed in terms of hours and specified as floating point
+    quantities, so, for example, 4:30pm would be entered as 16.5. Any data which do not match this format will be
+    silently discarded, you have been warned!</p>
+<p>The plot, as displayed, can be downloaded by right-clicking on it and selecting the <em>Save image as...</em> option
+    (this may only work on Chrome, I've not tried any other browsers).</p>
+<hr/>
+<circular-plot params='data: plotData, config: plotConfig, stats: plotStats'></circular-plot>
+
+<div data-bind="if: plotStats.dataPointCount()>0">
+    Circular mean is:
+    <div style='display: inline; font-weight: bold' data-bind='text: plotStats.circularMean()'></div>
+    , vector magnitude is
+    <div style='display: inline; font-weight: bold' data-bind='text: plotStats.vectorMagnitude()'></div>
+    , there were
+    <div style='display: inline; font-weight: bold' data-bind='text: plotStats.dataPointCount()'>
+    </div>
+    data points.
+</div>
+<hr/>
+<h2>Data</h2>
+<p>Enter data in the box below.</p>
+<textarea
+        placeholder="Enter your data here, the format should be as integer or floating point numbers, so e.g. 6:30pm would be 18.5"
+        rows="4" cols="80" data-bind="textInput: dataAsString"></textarea>
+<hr/>
+<h2>Configuration</h2>
+<p>Use the controls below to customise the chart.</p>
+<hr/>
+<form class="form-horizontal">
+    <div class="form-group">
+        <label class="control-label col-xs-2">Hours in Cycle</label>
+        <div class="col-xs-4">
+            <input type="text" placeholder="Hours in cycle, e.g. '24'" class="form-control"
+                   data-bind="value: plotConfig.lengthOfDay"/>
+        </div>
+        <label class="control-label col-xs-2">Bin size (hours)</label>
+        <div class="col-xs-4">
+            <input type="text" placeholder="Bin size in hours, i.e. 0.25 for 15 minutes" class="form-control"
+                   data-bind="value: plotConfig.binSize"/>
+        </div>
+    </div>
+    <hr/>
+    <div class="form-group">
+        <label class="control-label col-xs-2">Image size (pixels)</label>
+        <div class="col-xs-4">
+            <input type="text" placeholder="Image size" class="form-control"
+                   data-bind="value: plotConfig.canvasSize"/>
+        </div>
+
+        <label class="control-label col-xs-2">Main axis radius (pixels)</label>
+        <div class="col-xs-4">
+            <input type="text" placeholder="Axis radius" class="form-control"
+                   data-bind="value: plotConfig.mainAxisRadius"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-2">Main axis width (pixels)</label>
+        <div class="col-xs-4">
+            <input type="text" placeholder="Axis width" class="form-control"
+                   data-bind="value: plotConfig.mainAxisWidth"/>
+        </div>
+        <label class="control-label col-xs-2">Main axis colour</label>
+        <div class="col-xs-4">
+            <input data-bind="kendoColorPicker: { palette: colorPalette, value: plotConfig.mainAxisColour }"/>
+        </div>
+    </div>
+    <hr/>
+    <div class="form-group">
+        <label class="control-label col-xs-2">Hour tick width (pixels)</label>
+        <div class="col-xs-4">
+            <input type="text" placeholder="Hour tick width" class="form-control"
+                   data-bind="value: plotConfig.axisTickWidth"/>
+        </div>
+        <label class="control-label col-xs-2">Hour tick colour</label>
+        <div class="col-xs-4">
+            <input data-bind="kendoColorPicker: { palette: colorPalette, value: plotConfig.axisTickColour }"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-2">Hour tick length (pixels)</label>
+        <div class="col-xs-4">
+            <input type="text" placeholder="Hour tick length" class="form-control"
+                   data-bind="value: plotConfig.axisTickLength"/>
+        </div>
+    </div>
+    <hr/>
+    <div class="form-group">
+        <label class="control-label col-xs-2">Bin tick width (pixels)</label>
+        <div class="col-xs-4">
+            <input type="text" placeholder="Hour tick width" class="form-control"
+                   data-bind="value: plotConfig.binTickWidth"/>
+        </div>
+
+        <label class="control-label col-xs-2">Bin tick colour</label>
+        <div class="col-xs-4">
+            <input data-bind="kendoColorPicker: { palette: colorPalette, value: plotConfig.binTickColour }"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-2">Bin tick length (pixels)</label>
+        <div class="col-xs-4">
+            <input type="text" placeholder="Hour tick length" class="form-control"
+                   data-bind="value: plotConfig.binTickSize"/>
+        </div>
+    </div>
+    <hr/>
+    <div class="form-group">
+        <label class="control-label col-xs-2">Data colour</label>
+        <div class="col-xs-4">
+            <input data-bind="kendoColorPicker: { palette: colorPalette, value: plotConfig.blobColour }"/>
+        </div>
+        <label class="control-label col-xs-2">Modal data colour</label>
+        <div class="col-xs-4">
+            <input data-bind="kendoColorPicker: { palette: colorPalette, value: plotConfig.modalBlobColour }"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-2">Mean data colour</label>
+        <div class="col-xs-4">
+            <input data-bind="kendoColorPicker: { palette: colorPalette, value: plotConfig.meanBlobColour }"/>
+        </div>
+        <label class="control-label col-xs-2">Variance colour</label>
+        <div class="col-xs-4">
+            <input data-bind="kendoColorPicker: { palette: colorPalette, value: plotConfig.magnitudeBlobColour }"/>
+        </div>
+    </div>
+    <hr/>
+    <div class="form-group">
+        <label class="control-label col-xs-2">Data size (pixels)</label>
+        <div class="col-xs-4">
+            <input type="text" placeholder="Image size" class="form-control"
+                   data-bind="value: plotConfig.blobSize"/>
+        </div>
+        <label class="control-label col-xs-2">Mean data (pixels)</label>
+        <div class="col-xs-4">
+            <input type="text" placeholder="Axis radius" class="form-control"
+                   data-bind="value: plotConfig.meanBlobSize"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-2">Variance size (pixels)</label>
+        <div class="col-xs-4">
+            <input type="text" placeholder="Image size" class="form-control"
+                   data-bind="value: plotConfig.magnitudeBlobSize"/>
+        </div>
+        <label class="control-label col-xs-2">Variance line width (pixels)</label>
+        <div class="col-xs-4">
+            <input type="text" placeholder="Axis radius" class="form-control"
+                   data-bind="value: plotConfig.magnitudeLineWidth"/>
+        </div>
+    </div>
+    <hr/>
+</form>
+<h2>Advanced</h2>
+<p>The box below shows a textual representation of the entire state of this page. Because this application runs
+    exclusively on your browser, and therefore doesn't have anywhere to save your file, you can instead copy the text
+    below into a file or email, then at a later date paste it back into this box. This will then set up the page as it
+    was when you copied the text.</p>
+<textarea rows="6" cols="120" data-bind="value: configJSON"></textarea>
+
+
+</form>
