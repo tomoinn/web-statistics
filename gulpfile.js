@@ -17,9 +17,10 @@ requireJsOptimizerConfig = merge(requireJsRuntimeConfig, {
     include: [
         'requireLib',
         'components/nav-bar/nav-bar',
-        'components/home-page/home',
+        'text!components/home-page/home.html',
         'text!components/about-page/about.html',
-        'components/circular-plot/circular-plot'
+        'components/circular-plot/circular-plot',
+        'components/circular-plot-page/circular-plot-page'
     ],
     insertRequire: ['app/startup'],
     bundles: {
