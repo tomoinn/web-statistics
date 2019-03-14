@@ -1,5 +1,5 @@
 // require.js looks for the following global when initializing
-var require = {
+require = {
     baseUrl: ".",
     paths: {
         "bootstrap": "bower_modules/components-bootstrap/js/bootstrap.min",
@@ -12,12 +12,11 @@ var require = {
         "signals": "bower_modules/js-signals/dist/signals.min",
         "text": "bower_modules/requirejs-text/text",
         "colour": "bower_modules/tinycolor/tinycolor",
-        "kendo": "bower_modules/kendo-ui-core/js/kendo.ui.core.min",
-        "kendobindings": "bower_modules/knockout-kendo/build/knockout-kendo.min"
+        "knockout-kendo": "bower_modules/knockout-kendo/build/knockout-kendo.min",
+        "kendo": "https://kendo.cdn.telerik.com/2018.1.221/js/kendo.all.min"
     },
     shim: {
         "bootstrap": {deps: ["jquery"]},
-        "kendo": {deps: ["jquery"]},
-        "kendobindings": {deps: ["jquery", "kendo", "knockout"]}
+        "knockout-kendo": {deps: ["jquery", "kendo", "knockout"]}
     }
 };
