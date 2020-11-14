@@ -26,6 +26,23 @@ function CircularPlot(element, params) {
     self.subscriptions.push(params.data.subscribe(listener));
     self.canvasSize = params.config.canvasSize();
     listener();
+
+    if (window.devicePixelRatio && window.matchMedia) {
+        let mediaQuery = null;
+        function updateMediaQuery () {
+            if (mediaQuery) {
+                mediaQuery.removeEventListener('change', mediaCallback);
+            }
+            mediaQuery = window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`)
+            mediaQuery.addEventListener('change', mediaCallback);
+        }
+
+        function mediaCallback(ev) {
+            updateMediaQuery();
+            listener();
+        }
+        updateMediaQuery();
+    }
 }
 
 /**
@@ -133,8 +150,14 @@ function updateChart(canvas, extraConfig, data, stats) {
      * Draw the axis
      */
     var initCanvas = function () {
-        canvas.width = config.canvasSize;
-        canvas.height = config.canvasSize;
+        const resolution = window.devicePixelRatio || 1;
+        
+        canvas.width = config.canvasSize * resolution;
+        canvas.height = config.canvasSize * resolution;
+        canvas.style.width = `${config.canvasSize}px`;
+        canvas.style.height = `${config.canvasSize}px`;
+
+        ctx.scale(resolution, resolution);
         ctx.translate(config.canvasSize / 2, config.canvasSize / 2);
         ctx.save();
         ctx.strokeStyle = config.mainAxisColour;
