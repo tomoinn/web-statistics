@@ -1,4 +1,4 @@
-define(["knockout", "text!./circular-plot-page.html", "knockout-mapping"], function (ko, homeTemplate, mapping) {
+define(["knockout", "./circular-plot-page.html", "knockout-mapping"], function (ko, homeTemplate, mapping) {
 
     function CircularPlotPage(route) {
         var self = this;

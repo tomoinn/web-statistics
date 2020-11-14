@@ -1,16 +1,34 @@
-define(['jquery', 'knockout', './router', 'bootstrap', 'kendo', 'knockout-kendo'], function ($, ko, router) {
+define([
+    'jquery',
+    'knockout',
+    './router',
+    '../components/nav-bar/nav-bar',
+    '../components/home-page/home.html',
+    '../components/circular-plot-page/circular-plot-page',
+    '../components/circular-plot/circular-plot',
+    '../components/about-page/about.html',
+    
+    // imports just for side effects
+    'bootstrap',
+    'kendo-ui-core',
+    'knockout-kendo',
+    'bootstrap/dist/css/bootstrap.min.css',
+    '../css/styles.css',
+    'kendo-ui-core/css/web/kendo.common-bootstrap.css',
+    'kendo-ui-core/css/web/kendo.bootstrap.css'
+], function ($, ko, router, NavBar, HomePage, CPPage, CircularPlot, AboutPage) {
 
     // Components can be packaged as AMD modules, such as the following:
-    ko.components.register('nav-bar', {require: 'components/nav-bar/nav-bar'});
+    ko.components.register('nav-bar', NavBar);
     ko.components.register('home-page', {
-        template: {require: 'text!components/home-page/home.html'}
+        template: HomePage
     });
-    ko.components.register('circular-plot-page', {require: 'components/circular-plot-page/circular-plot-page'});
-    ko.components.register('circular-plot', {require: 'components/circular-plot/circular-plot'});
+    ko.components.register('circular-plot-page', CPPage);
+    ko.components.register('circular-plot', CircularPlot);
 
     // ... or for template-only components, you can just point to a .html file directly:
     ko.components.register('about-page', {
-        template: {require: 'text!components/about-page/about.html'}
+        template: AboutPage
     });
 
     // [Scaffolded component registrations will be inserted here. To retain this feature, don't remove this comment.]

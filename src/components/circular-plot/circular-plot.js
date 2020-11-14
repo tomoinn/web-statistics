@@ -1,7 +1,7 @@
 /**
  * Created by tom on 28/06/16.
  */
-define(['knockout', 'text!./circular-plot.html', 'jquery', 'colour'], function (ko, templateMarkup, jquery, tinycolour) {
+define(['knockout', './circular-plot.html', 'jquery', 'colour'], function (ko, templateMarkup, jquery, tinycolour) {
 
     /**
      * New circular plot
