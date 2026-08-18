@@ -7,3 +7,4 @@ dist/
 
 # Don't track IDEA files
 .idea/
+/dist/
