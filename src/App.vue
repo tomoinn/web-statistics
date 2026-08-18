@@ -1,9 +1,9 @@
 <script setup>
-import {computed, onMounted, onUnmounted, shallowRef} from 'vue';
+import {computed, defineAsyncComponent, onMounted, onUnmounted, shallowRef} from 'vue';
 import NavBar from './components/NavBar.vue';
-import HomePage from './components/HomePage.vue';
-import AboutPage from './components/AboutPage.vue';
-import CircularPlotPage from './components/CircularPlotPage.vue';
+
+const HomePage = defineAsyncComponent(() => import('./components/HomePage.vue'));
+const CircularPlotPage = defineAsyncComponent(() => import('./components/CircularPlotPage.vue'));
 
 const currentHash = shallowRef(window.location.hash || '#');
 
@@ -16,6 +16,8 @@ const page = computed(() => {
   }
   return 'home';
 });
+
+const currentPageComponent = computed(() => page.value === 'home' ? HomePage : CircularPlotPage);
 
 function onHashChanged() {
   currentHash.value = window.location.hash || '#';
@@ -35,9 +37,7 @@ onUnmounted(() => {
     <NavBar :page="page"/>
     <v-main id="page">
       <v-container class="">
-        <HomePage v-if="page === 'home'"/>
-        <AboutPage v-else-if="page === 'about'"/>
-        <CircularPlotPage v-else/>
+        <component :is="currentPageComponent"/>
       </v-container>
     </v-main>
   </v-app>

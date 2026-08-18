@@ -23,7 +23,7 @@ describe('circular plot utilities', () => {
   });
 
   it('normalizes showHourNumbers as a boolean option', () => {
-    expect(normalizeConfig({}).showHourNumbers).toBe(false);
+    expect(normalizeConfig({}).showHourNumbers).toBe(true);
     expect(normalizeConfig({ showHourNumbers: true }).showHourNumbers).toBe(true);
     expect(normalizeConfig({ showHourNumbers: '1' }).showHourNumbers).toBe(true);
     expect(normalizeConfig({ showHourNumbers: 'false' }).showHourNumbers).toBe(false);

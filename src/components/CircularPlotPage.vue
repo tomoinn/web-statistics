@@ -263,12 +263,12 @@ async function onFileDrop(event) {
 
 <template>
   <div
-    class="circular-plot-page"
-    :class="{ 'circular-plot-page--drop-active': isDraggingStateFile }"
-    @dragenter="onFileDragEnter"
-    @dragover="onFileDragOver"
-    @dragleave="onFileDragLeave"
-    @drop="onFileDrop"
+      :class="{ 'circular-plot-page--drop-active': isDraggingStateFile }"
+      class="circular-plot-page"
+      @dragenter="onFileDragEnter"
+      @dragleave="onFileDragLeave"
+      @dragover="onFileDragOver"
+      @drop="onFileDrop"
   >
     <h2 class="text-h4 mb-2 mt-0">Circular Plot</h2>
     <p class="mb-4">
@@ -281,7 +281,9 @@ async function onFileDrop(event) {
     </div>
 
     <v-alert v-if="plotStats.dataPointCount > 0" class="stats-summary" type="info" variant="tonal">
-      Circular mean is <strong>{{ plotStats.circularMean }}</strong>, vector magnitude is
+      <a href="https://en.wikipedia.org/wiki/Circular_mean" rel="noopener noreferrer"
+         target="_blank" @click.stop>Circular mean</a> is <strong>{{ plotStats.circularMean }}</strong>, vector
+      magnitude is
       <strong>{{ plotStats.vectorMagnitude }}</strong>, there were
       <strong>{{ plotStats.dataPointCount }}</strong> data points.
     </v-alert>
@@ -291,14 +293,14 @@ async function onFileDrop(event) {
         <v-btn color="primary" variant="outlined" @click="exportPlotAsSvg">Export SVG</v-btn>
         <v-menu>
           <template #activator="{ props }">
-            <v-btn color="primary" variant="outlined" append-icon="mdi-menu-down" v-bind="props">Export PNG</v-btn>
+            <v-btn append-icon="mdi-menu-down" color="primary" v-bind="props" variant="outlined">Export PNG</v-btn>
           </template>
           <v-list density="compact">
             <v-list-item
-              v-for="size in pngExportSizes"
-              :key="`png-size-${size}`"
-              :title="`${size}px`"
-              @click="exportPlotAsPng(size)"
+                v-for="size in pngExportSizes"
+                :key="`png-size-${size}`"
+                :title="`${size}px`"
+                @click="exportPlotAsPng(size)"
             />
           </v-list>
         </v-menu>
@@ -308,25 +310,24 @@ async function onFileDrop(event) {
         <v-btn color="primary" @click="exportStateToFile">Save plot file</v-btn>
         <v-btn variant="outlined" @click="openImportDialog">Load plot file</v-btn>
         <input
-          ref="fileInput"
-          class="state-file-input"
-          type="file"
-          accept="application/json,.json"
-          @change="onImportFileChange"
+            ref="fileInput"
+            accept="application/json,.json"
+            class="state-file-input"
+            type="file"
+            @change="onImportFileChange"
         >
       </div>
     </div>
-    <v-alert v-if="importError" type="error" variant="tonal" class="mb-3">{{ importError }}</v-alert>
+    <v-alert v-if="importError" class="mb-3" type="error" variant="tonal">{{ importError }}</v-alert>
     <v-alert v-if="exportError" class="mt-3" type="error" variant="tonal">{{ exportError }}</v-alert>
-
 
 
     <v-divider class="my-6"/>
     <h3 class="text-h5 mb-2">Data</h3>
     <v-textarea
         v-model="dataAsString"
-        rows="4"
         placeholder="Enter comma-separated integer/floating-point data"
+        rows="4"
         variant="outlined"
     />
     <div class="config-grid mb-4">
@@ -335,9 +336,9 @@ async function onFileDrop(event) {
           :key="key"
           v-model.number="plotConfig[key]"
           :label="label || key"
+          density="comfortable"
           type="number"
           variant="outlined"
-          density="comfortable"
       />
     </div>
 
@@ -349,9 +350,9 @@ async function onFileDrop(event) {
           :key="key"
           v-model.number="plotConfig[key]"
           :label="label || key"
+          density="comfortable"
           type="number"
           variant="outlined"
-          density="comfortable"
       />
     </div>
 
@@ -361,9 +362,9 @@ async function onFileDrop(event) {
           :key="key"
           v-model="plotConfig[key]"
           :label="label || key"
+          density="comfortable"
           type="color"
           variant="outlined"
-          density="comfortable"
       />
     </div>
 
@@ -376,11 +377,6 @@ async function onFileDrop(event) {
           color="primary"
       />
     </div>
-
-    <h3 class="text-h5 mb-2">Advanced</h3>
-    <p class="state-drop-hint mb-3">Drag a saved state JSON file anywhere on this page to load configuration and data.</p>
-
-    <v-textarea v-model="configJSON" rows="6" variant="outlined"/>
   </div>
 </template>
 
