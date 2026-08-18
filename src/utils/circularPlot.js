@@ -1,8 +1,5 @@
-import tinycolor from 'tinycolor2';
-
 export const DEFAULT_CONFIG = {
   lengthOfDay: 24,
-  mainAxisRadius: 200,
   mainAxisWidth: 2,
   mainAxisColour: '#333333',
   axisTickWidth: 1,
@@ -22,12 +19,11 @@ export const DEFAULT_CONFIG = {
   blobLineWidth: 2,
   blobSize: 10,
   blobSep: 5,
-  canvasSize: 500
+  showHourNumbers: true
 };
 
 const NUMERIC_RULES = {
   lengthOfDay: { precision: 2, defaultValue: 24 },
-  mainAxisRadius: { precision: 0, defaultValue: 200 },
   mainAxisWidth: { precision: 0, defaultValue: 2 },
   axisTickWidth: { precision: 0, defaultValue: 1 },
   axisTickLength: { precision: 0, defaultValue: 6 },
@@ -39,8 +35,11 @@ const NUMERIC_RULES = {
   magnitudeLineWidth: { precision: 0, defaultValue: 2 },
   blobLineWidth: { precision: 0, defaultValue: 2 },
   blobSize: { precision: 0, defaultValue: 10 },
-  blobSep: { precision: 0, defaultValue: 5 },
-  canvasSize: { precision: 0, defaultValue: 500 }
+  blobSep: { precision: 0, defaultValue: 5 }
+};
+
+const BOOLEAN_RULES = {
+  showHourNumbers: { defaultValue: false }
 };
 
 export function normalizeNumber(value, spec) {
@@ -57,10 +56,36 @@ export function normalizeNumber(value, spec) {
 
 export function normalizeConfig(configInput = {}) {
   const merged = { ...DEFAULT_CONFIG, ...configInput };
-  const normalized = { ...merged };
+  const normalized = {};
+
+  Object.keys(DEFAULT_CONFIG).forEach((key) => {
+    normalized[key] = merged[key];
+  });
 
   Object.entries(NUMERIC_RULES).forEach(([key, rule]) => {
     normalized[key] = normalizeNumber(merged[key], rule);
+  });
+
+  Object.entries(BOOLEAN_RULES).forEach(([key, rule]) => {
+    const value = merged[key];
+    if (typeof value === 'boolean') {
+      normalized[key] = value;
+      return;
+    }
+
+    if (typeof value === 'string') {
+      const normalizedString = value.trim().toLowerCase();
+      if (normalizedString === 'true' || normalizedString === '1') {
+        normalized[key] = true;
+        return;
+      }
+      if (normalizedString === 'false' || normalizedString === '0' || normalizedString === '') {
+        normalized[key] = false;
+        return;
+      }
+    }
+
+    normalized[key] = value === null || value === undefined ? rule.defaultValue : Boolean(value);
   });
 
   return normalized;
@@ -74,6 +99,35 @@ export function parseDataInput(dataAsString) {
     .split(',')
     .map((value) => parseFloat(value))
     .filter((value) => !Number.isNaN(value));
+}
+
+export function normalizeDataArray(dataInput) {
+  if (!Array.isArray(dataInput)) {
+    return [];
+  }
+
+  return dataInput
+    .map((value) => (typeof value === 'number' ? value : parseFloat(value)))
+    .filter((value) => !Number.isNaN(value));
+}
+
+export function serializeCircularPlotState(configInput, dataInput) {
+  return JSON.stringify({
+    config: normalizeConfig(configInput || {}),
+    data: normalizeDataArray(dataInput)
+  });
+}
+
+export function parseCircularPlotState(serializedState) {
+  const parsed = JSON.parse(serializedState);
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new Error('Invalid circular plot state');
+  }
+
+  return {
+    config: normalizeConfig(parsed.config || {}),
+    data: normalizeDataArray(parsed.data)
+  };
 }
 
 function circularMean(sumOfSin, sumOfCos) {
@@ -115,138 +169,4 @@ export function calculateCircularStats(data, lengthOfDay) {
     vectorMagnitude,
     dataPointCount: validDataPoints
   };
-}
-
-export function drawCircularPlot(canvas, configInput, dataInput) {
-  const ctx = canvas.getContext('2d');
-  const config = normalizeConfig(configInput);
-  const data = dataInput.filter((value) => !Number.isNaN(value));
-
-  const hourToRadians = (hour) => (Math.PI * 2 * hour) / config.lengthOfDay;
-  const radiansToHours = (radians) => (radians / (Math.PI * 2)) * config.lengthOfDay;
-  const polarToCart = (hour, offset) => {
-    const radians = hourToRadians(hour) - Math.PI / 2;
-    const radius = config.mainAxisRadius + offset;
-    return {
-      x: radius * Math.cos(radians),
-      y: radius * Math.sin(radians)
-    };
-  };
-
-  const drawBlob = (coordinates, radius, colour = config.blobColour) => {
-    ctx.save();
-    ctx.strokeStyle = tinycolor(colour).darken(50).toHexString();
-    ctx.fillStyle = tinycolor(colour).toHexString();
-    ctx.lineWidth = config.blobLineWidth;
-    ctx.beginPath();
-    ctx.arc(coordinates.x, coordinates.y, radius, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-    ctx.closePath();
-    ctx.restore();
-  };
-
-  const resolution = window.devicePixelRatio || 1;
-  canvas.width = config.canvasSize * resolution;
-  canvas.height = config.canvasSize * resolution;
-  canvas.style.width = `${config.canvasSize}px`;
-  canvas.style.height = `${config.canvasSize}px`;
-
-  ctx.setTransform(resolution, 0, 0, resolution, config.canvasSize / 2, config.canvasSize / 2);
-
-  ctx.save();
-  ctx.strokeStyle = config.mainAxisColour;
-  ctx.lineWidth = config.mainAxisWidth;
-  ctx.beginPath();
-  ctx.arc(0, 0, config.mainAxisRadius, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.closePath();
-  ctx.strokeStyle = config.axisTickColour;
-  ctx.lineWidth = config.axisTickWidth;
-  for (let hour = 0; hour < config.lengthOfDay; hour += 1) {
-    const from = polarToCart(hour, config.mainAxisWidth / 2);
-    const to = polarToCart(hour, config.mainAxisWidth / 2 + config.axisTickLength);
-    ctx.beginPath();
-    ctx.moveTo(from.x, from.y);
-    ctx.lineTo(to.x, to.y);
-    ctx.stroke();
-    ctx.closePath();
-  }
-  ctx.strokeStyle = config.binTickColour;
-  ctx.lineWidth = config.binTickWidth;
-  for (let binHour = 0; binHour < config.lengthOfDay; binHour += config.binSize) {
-    const tickFrom = polarToCart(binHour, -config.mainAxisWidth / 2);
-    const tickTo = polarToCart(binHour, -(config.binTickSize + config.mainAxisWidth / 2));
-    ctx.beginPath();
-    ctx.moveTo(tickFrom.x, tickFrom.y);
-    ctx.lineTo(tickTo.x, tickTo.y);
-    ctx.stroke();
-    ctx.closePath();
-  }
-  ctx.restore();
-
-  const hist = new Array(config.lengthOfDay / config.binSize).fill(0);
-  let validDataPoints = 0;
-  let sumOfSin = 0;
-  let sumOfCos = 0;
-  let maxCount = 0;
-
-  data.forEach((value) => {
-    const point = value % config.lengthOfDay;
-    validDataPoints += 1;
-    const bin = Math.floor((value / config.binSize) % (config.lengthOfDay / config.binSize));
-    hist[bin] += 1;
-    maxCount = Math.max(maxCount, hist[bin]);
-    sumOfSin += Math.sin(hourToRadians(point));
-    sumOfCos += Math.cos(hourToRadians(point));
-  });
-
-  hist.forEach((binCount, binIndex) => {
-    const colour = binCount === maxCount ? config.modalBlobColour : config.blobColour;
-    const binHour = (binIndex + 0.5) * config.binSize;
-    for (let count = 0; count < binCount; count += 1) {
-      drawBlob(
-        polarToCart(binHour, -(count * (config.blobSize + config.blobSep) + config.blobSep + config.blobSize / 2)),
-        config.blobSize / 2,
-        colour
-      );
-    }
-  });
-
-  const stats = {
-    circularMean: null,
-    vectorMagnitude: null,
-    dataPointCount: validDataPoints
-  };
-
-  if (validDataPoints > 0) {
-    const meanHour = radiansToHours(circularMean(sumOfSin, sumOfCos));
-    const magnitude = Math.sqrt((sumOfSin / validDataPoints) ** 2 + (sumOfCos / validDataPoints) ** 2);
-    const meanPoint = polarToCart(meanHour, 0);
-    const magnitudePoint = polarToCart(meanHour, -(1 - magnitude) * config.mainAxisRadius);
-
-    ctx.save();
-    ctx.strokeStyle = tinycolor(config.magnitudeBlobColour).darken(50).toHexString();
-    ctx.lineWidth = config.magnitudeLineWidth;
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo(magnitudePoint.x, magnitudePoint.y);
-    ctx.stroke();
-    ctx.closePath();
-    ctx.strokeStyle = config.mainAxisColour;
-    ctx.beginPath();
-    ctx.moveTo(magnitudePoint.x, magnitudePoint.y);
-    ctx.lineTo(meanPoint.x, meanPoint.y);
-    ctx.stroke();
-    ctx.closePath();
-    ctx.restore();
-
-    drawBlob(meanPoint, config.meanBlobSize / 2, config.meanBlobColour);
-    drawBlob(magnitudePoint, config.magnitudeBlobSize / 2, config.magnitudeBlobColour);
-
-    stats.circularMean = meanHour;
-    stats.vectorMagnitude = magnitude;
-  }
-
-  return stats;
 }

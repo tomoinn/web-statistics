@@ -34,7 +34,7 @@ onUnmounted(() => {
   <v-app>
     <NavBar :page="page"/>
     <v-main id="page">
-      <v-container class="py-6">
+      <v-container class="">
         <HomePage v-if="page === 'home'"/>
         <AboutPage v-else-if="page === 'about'"/>
         <CircularPlotPage v-else/>
