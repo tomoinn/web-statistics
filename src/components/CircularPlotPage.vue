@@ -1,10 +1,10 @@
 <script setup>
-import { computed, reactive, shallowRef } from 'vue';
+import {computed, reactive, shallowRef} from 'vue';
 import CircularPlotCanvas from './CircularPlotCanvas.vue';
-import { DEFAULT_CONFIG, normalizeConfig, parseDataInput } from '../utils/circularPlot';
+import {DEFAULT_CONFIG, normalizeConfig, parseDataInput} from '../utils/circularPlot';
 
 const dataAsString = shallowRef('');
-const plotConfig = reactive({ ...DEFAULT_CONFIG });
+const plotConfig = reactive({...DEFAULT_CONFIG});
 const plotStats = reactive({
   circularMean: null,
   vectorMagnitude: null,
@@ -24,7 +24,7 @@ const safeConfig = computed(() => normalizeConfig(plotConfig));
 
 const configJSON = computed({
   get() {
-    return JSON.stringify({ config: safeConfig.value, data: plotData.value });
+    return JSON.stringify({config: safeConfig.value, data: plotData.value});
   },
   set(value) {
     try {
@@ -50,55 +50,69 @@ function updateStats(stats) {
 </script>
 
 <template>
-  <div>
-    <h2>Circular Plot</h2>
-    <p>
+  <div class="circular-plot-page">
+    <h2 class="text-h4 mb-2">Circular Plot</h2>
+    <p class="mb-4">
       This page can be used to produce a circular plot with variable cycle length and binning.
     </p>
-    <hr>
+    <v-divider class="mb-6"/>
 
-    <CircularPlotCanvas :config="safeConfig" :data="plotData" @stats-change="updateStats" />
+    <CircularPlotCanvas :config="safeConfig" :data="plotData" @stats-change="updateStats"/>
 
-    <div v-if="plotStats.dataPointCount > 0" class="stats-summary">
+    <v-alert v-if="plotStats.dataPointCount > 0" class="stats-summary" type="info" variant="tonal">
       Circular mean is <strong>{{ plotStats.circularMean }}</strong>, vector magnitude is
       <strong>{{ plotStats.vectorMagnitude }}</strong>, there were
       <strong>{{ plotStats.dataPointCount }}</strong> data points.
+    </v-alert>
+
+    <v-divider class="my-6"/>
+    <h3 class="text-h5 mb-2">Data</h3>
+    <v-textarea
+        v-model="dataAsString"
+        rows="4"
+        placeholder="Enter comma-separated integer/floating-point data"
+        variant="outlined"
+    />
+
+    <v-divider class="my-6"/>
+    <h3 class="text-h5 mb-4">Configuration</h3>
+    <div class="config-grid mb-4">
+      <v-text-field
+          v-for="key in numericKeys"
+          :key="key"
+          v-model.number="plotConfig[key]"
+          :label="key"
+          type="number"
+          variant="outlined"
+          density="comfortable"
+      />
     </div>
 
-    <hr>
-    <h2>Data</h2>
-    <textarea
-      v-model="dataAsString"
-      rows="4"
-      cols="80"
-      class="form-control"
-      placeholder="Enter comma-separated integer/floating-point data"
-    ></textarea>
+    <div class="config-grid">
+      <v-text-field
+          v-for="key in colorKeys"
+          :key="key"
+          v-model="plotConfig[key]"
+          :label="key"
+          type="color"
+          variant="outlined"
+          density="comfortable"
+      />
+    </div>
 
-    <hr>
-    <h2>Configuration</h2>
-    <form class="form-horizontal">
-      <div v-for="key in numericKeys" :key="key" class="form-group">
-        <label class="control-label col-xs-4">{{ key }}</label>
-        <div class="col-xs-8">
-          <input v-model="plotConfig[key]" type="number" class="form-control">
-        </div>
-      </div>
-      <div v-for="key in colorKeys" :key="key" class="form-group">
-        <label class="control-label col-xs-4">{{ key }}</label>
-        <div class="col-xs-8">
-          <input v-model="plotConfig[key]" type="color" class="form-control">
-        </div>
-      </div>
-    </form>
-
-    <h2>Advanced</h2>
-    <textarea v-model="configJSON" rows="6" cols="120" class="form-control"></textarea>
+    <h3 class="text-h5 mb-2">Advanced</h3>
+    <v-textarea v-model="configJSON" rows="6" variant="outlined"/>
   </div>
 </template>
 
 <style scoped>
 .stats-summary {
   margin-top: 1rem;
+}
+
+.config-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
 </style>

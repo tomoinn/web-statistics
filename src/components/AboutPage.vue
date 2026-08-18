@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>About</h2>
+    <h2 class="text-h4 mb-4">About</h2>
     <p>
       This website was created by
       <a href="https://github.com/tomoinn/">Tom Oinn</a> and is licensed under the Apache Software License 2.0.

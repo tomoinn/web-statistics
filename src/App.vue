@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, onUnmounted, shallowRef } from 'vue';
+import {computed, onMounted, onUnmounted, shallowRef} from 'vue';
 import NavBar from './components/NavBar.vue';
 import HomePage from './components/HomePage.vue';
 import AboutPage from './components/AboutPage.vue';
@@ -31,10 +31,14 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <NavBar :page="page" />
-  <main id="page" class="container">
-    <HomePage v-if="page === 'home'" />
-    <AboutPage v-else-if="page === 'about'" />
-    <CircularPlotPage v-else />
-  </main>
+  <v-app>
+    <NavBar :page="page"/>
+    <v-main id="page">
+      <v-container class="py-6">
+        <HomePage v-if="page === 'home'"/>
+        <AboutPage v-else-if="page === 'about'"/>
+        <CircularPlotPage v-else/>
+      </v-container>
+    </v-main>
+  </v-app>
 </template>
